@@ -53,16 +53,51 @@
 		isPlaying = false;
 	};
 
-	function onKeyDown(e: KeyboardEvent) {
-		// Return and exist the key down event when not playing
-		// This is only solution I found to stop keyboard event in Svelte :)
+	function onHandleUserInputKeyDown(e: KeyboardEvent) {
+		// Return if the game is not playing
 		if (!isPlaying) return;
 
-		console.log(e.key);
+		// Detect the actual character typed, handling Shift and other modifier keys
+		let inputChar = e.key;
+
+		// If the key is a single character (letters, numbers, symbols), handle case mapping
+		if (inputChar.length === 1) {
+			// If Shift is held, keep the character as uppercase; otherwise, make it match the actual intended case
+			if (!e.shiftKey) {
+				inputChar = inputChar.toLowerCase();
+			}
+			// Append the character to user input
+			userInputText += inputChar;
+
+			// Update accuracy and errors
+			const targetChar = currentText[userInputText.length - 1];
+			if (inputChar === targetChar) {
+				// Correct input, no action needed
+			} else {
+				// Increment errors if the character doesn't match
+				errors++;
+			}
+
+			// Check if user has completed the text
+			if (userInputText.length === currentText.length) {
+				stopGame();
+			}
+		}
+
+		// If the key is "Backspace", allow deletion from user input
+		if (e.key === 'Backspace') {
+			userInputText = userInputText.slice(0, -1);
+		}
 	}
 
 	// Init the game
 	startGame();
+	$inspect(userInputText);
+	$effect(() => {
+		if (currentText.trim() === userInputText.trim()) {
+			stopGame();
+		}
+	});
 </script>
 
 <main class="h-full bg-zinc-900 pt-10 text-gray-200">
@@ -74,4 +109,4 @@
 	</div>
 </main>
 
-<svelte:window on:keydown|preventDefault={onKeyDown} />
+<svelte:window on:keydown|preventDefault={onHandleUserInputKeyDown} />
