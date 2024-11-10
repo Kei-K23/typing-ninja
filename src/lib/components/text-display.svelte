@@ -1,7 +1,7 @@
 <script lang="ts">
 	interface Props {
 		currentText: string[];
-		userInput: string;
+		userInput: string[];
 		currentWordIndex: number;
 	}
 
@@ -9,27 +9,21 @@
 
 	let wordsWithStatus = $derived.by(() => {
 		return currentText.map((word, wordIndex) => {
-			if (wordIndex < currentWordIndex) {
-				// Completed words
-				return word.split('').map((char) => ({ char, status: 'past' }));
-			} else if (wordIndex === currentWordIndex) {
-				// Current word
-				return word.split('').map((char, charIndex) => {
-					if (charIndex < userInput.length) {
-						return {
-							char,
-							status: userInput[charIndex] === char ? 'correct' : 'incorrect'
-						};
-					} else if (charIndex === userInput.length) {
-						return { char, status: 'current' };
-					} else {
-						return { char, status: 'pending' };
-					}
-				});
-			} else {
-				// Future words
-				return word.split('').map((char) => ({ char, status: 'pending' }));
-			}
+			const input = userInput[wordIndex] || '';
+			return word.split('').map((char, charIndex) => {
+				if (charIndex < input.length) {
+					return {
+						char,
+						status: input[charIndex] === char ? 'correct' : 'incorrect'
+					};
+				} else if (wordIndex < currentWordIndex) {
+					return { char, status: 'incorrect' }; // Missing characters in completed words
+				} else if (wordIndex === currentWordIndex && charIndex === input.length) {
+					return { char, status: 'current' };
+				} else {
+					return { char, status: 'pending' };
+				}
+			});
 		});
 	});
 </script>
@@ -46,8 +40,8 @@
 					class:bg-gray-700={status === 'current'}>{char}</span
 				>
 			{/each}
-			{#if wordIndex === currentWordIndex && userInput.length > word.length}
-				<span class="text-red-500">{userInput.slice(word.length)}</span>
+			{#if userInput[wordIndex]?.length > word.length}
+				<span class="text-red-500">{userInput[wordIndex].slice(word.length)}</span>
 			{/if}
 		</span>
 	{/each}

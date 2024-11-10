@@ -7,7 +7,7 @@
 		isPlaying: false,
 		currentText: [] as string[],
 		currentWordIndex: 0,
-		userInput: '',
+		userInput: [] as string[],
 		accuracy: 100,
 		wpm: 0,
 		correctChars: 0,
@@ -42,7 +42,7 @@
 	const startGame = () => {
 		gameState.currentText = generateRandomText();
 		gameState.isPlaying = true;
-		gameState.userInput = '';
+		gameState.userInput = gameState.currentText.map(() => '');
 		gameState.currentWordIndex = 0;
 		gameState.correctChars = 0;
 		gameState.totalChars = 0;
@@ -60,7 +60,7 @@
 		resetTimer();
 		gameState = {
 			...gameState,
-			userInput: '',
+			userInput: [],
 			currentWordIndex: 0,
 			accuracy: 100,
 			wpm: 0,
@@ -74,39 +74,45 @@
 
 		const key = e.key;
 		const currentWord = gameState.currentText[gameState.currentWordIndex];
+		let currentInput = gameState.userInput[gameState.currentWordIndex];
 
 		if (key === ' ') {
-			// Move to next word regardless of correctness
-			gameState.currentWordIndex++;
-			gameState.userInput = '';
-
-			if (gameState.currentWordIndex >= gameState.currentText.length) {
+			// Move to next word, preserving incorrect characters
+			if (gameState.currentWordIndex < gameState.currentText.length - 1) {
+				gameState.currentWordIndex++;
+			} else {
+				// Stop the game here
 				stopGame();
 			}
 		} else if (key.length === 1) {
 			// Add character to user input
-			gameState.userInput += key;
+			currentInput += key;
+			gameState.userInput[gameState.currentWordIndex] = currentInput;
 			gameState.totalChars++;
 
 			// Check if the character is correct
 			if (
-				gameState.userInput.length <= currentWord.length &&
-				key === currentWord[gameState.userInput.length - 1]
+				currentInput.length <= currentWord.length &&
+				key === currentWord[currentInput.length - 1]
 			) {
 				gameState.correctChars++;
 			}
 		} else if (key === 'Backspace') {
 			// Remove last character from user input
-			if (gameState.userInput.length > 0) {
-				const lastChar = gameState.userInput[gameState.userInput.length - 1];
-				const expectedChar = currentWord[gameState.userInput.length - 1];
+			if (currentInput.length > 0) {
+				const lastChar = currentInput[currentInput.length - 1];
+				const expectedChar = currentWord[currentInput.length - 1];
 
-				gameState.userInput = gameState.userInput.slice(0, -1);
+				currentInput = currentInput.slice(0, -1);
+				gameState.userInput[gameState.currentWordIndex] = currentInput;
 				gameState.totalChars--;
 
 				if (lastChar === expectedChar) {
 					gameState.correctChars--;
 				}
+			} else if (gameState.currentWordIndex > 0) {
+				// Move to previous word
+				gameState.currentWordIndex--;
 			}
 		}
 
@@ -116,7 +122,6 @@
 	function updateAccuracy() {
 		gameState.accuracy = Math.round((gameState.correctChars / gameState.totalChars) * 100) || 100;
 	}
-
 	// Initialize the game
 	startGame();
 </script>
@@ -130,11 +135,11 @@
 			userInput={gameState.userInput}
 			currentWordIndex={gameState.currentWordIndex}
 		/>
-		<div class="mt-4 flex justify-center space-x-4">
+		<!-- <div class="mt-4 flex justify-center space-x-4">
 			<button class="rounded bg-orange-500 px-4 py-2 text-white" onclick={startGame}>Start</button>
 			<button class="rounded bg-red-500 px-4 py-2 text-white" onclick={stopGame}>Stop</button>
 			<button class="rounded bg-blue-500 px-4 py-2 text-white" onclick={resetGame}>Reset</button>
-		</div>
+		</div> -->
 		<div class="mt-4 text-center">
 			<p>WPM: {gameState.wpm}</p>
 			<p>Accuracy: {gameState.accuracy}%</p>
