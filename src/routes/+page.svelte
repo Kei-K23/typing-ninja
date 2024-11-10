@@ -1,111 +1,140 @@
 <script lang="ts">
-	import { texts } from '../data/text';
-	import type { GameState } from '../type';
-	import { generateRandomText } from '$lib/components/utils';
+	import { generateRandomText } from '$lib/utils';
 	import TextDisplay from '$lib/components/text-display.svelte';
 	import Timer from '$lib/components/timer.svelte';
 
-	let { isPlaying, currentText, userInputText, wpm, accuracy, errors } = $state<GameState>({
+	let gameState = $state({
 		isPlaying: false,
-		currentText: '',
-		userInputText: '',
+		currentText: [] as string[],
+		currentWordIndex: 0,
+		currentCharIndex: 0,
+		userInput: '',
 		accuracy: 0,
 		wpm: 0,
-		errors: 0
+		errors: 0,
+		timeElapsed: 0
 	});
-	let timeElapsed = $state(0);
-	let timerInterval = $state(0); // Timer interval to clear timer
 
-	export const startTimer = () => {
+	let timerInterval = $state(0);
+
+	const startTimer = () => {
 		timerInterval = setInterval(() => {
-			timeElapsed++;
+			gameState.timeElapsed++;
+			updateWPM();
 		}, 1000);
 	};
 
-	export const stopTimer = () => {
+	const stopTimer = () => {
 		clearInterval(timerInterval);
 	};
 
-	export const resetTimer = () => {
-		timeElapsed = 0;
+	const resetTimer = () => {
+		gameState.timeElapsed = 0;
 		clearInterval(timerInterval);
 	};
 
-	// Start the game state
+	const updateWPM = () => {
+		const minutes = gameState.timeElapsed / 60;
+		const wordsTyped = gameState.currentWordIndex;
+		gameState.wpm = Math.round(wordsTyped / minutes);
+	};
+
 	const startGame = () => {
-		currentText = generateRandomText(texts['beginner']);
-		isPlaying = true;
-		userInputText = '';
+		gameState.currentText = generateRandomText();
+		gameState.isPlaying = true;
+		gameState.userInput = '';
+		gameState.currentWordIndex = 0;
+		gameState.currentCharIndex = 0;
+		gameState.errors = 0;
+		gameState.accuracy = 100;
 		startTimer();
 	};
 
 	const stopGame = () => {
-		isPlaying = false;
+		gameState.isPlaying = false;
 		stopTimer();
 	};
 
 	const resetGame = () => {
-		userInputText = '';
-		accuracy = 0;
-		wpm = 0;
-		errors = 0;
+		stopGame();
 		resetTimer();
-		isPlaying = false;
+		gameState = {
+			...gameState,
+			userInput: '',
+			currentWordIndex: 0,
+			currentCharIndex: 0,
+			accuracy: 100,
+			wpm: 0,
+			errors: 0
+		};
 	};
 
 	function onHandleUserInputKeyDown(e: KeyboardEvent) {
-		// Return if the game is not playing
-		if (!isPlaying) return;
+		if (!gameState.isPlaying) return;
 
-		// Detect the actual character typed, handling Shift and other modifier keys
-		let inputChar = e.key;
+		const key = e.key;
+		const currentWord = gameState.currentText[gameState.currentWordIndex];
 
-		// If the key is a single character (letters, numbers, symbols), handle case mapping
-		if (inputChar.length === 1) {
-			// If Shift is held, keep the character as uppercase; otherwise, make it match the actual intended case
-			if (!e.shiftKey) {
-				inputChar = inputChar.toLowerCase();
-			}
-			// Append the character to user input
-			userInputText += inputChar;
+		if (key === ' ') {
+			if (gameState.userInput.trim() === currentWord) {
+				gameState.currentWordIndex++;
+				gameState.currentCharIndex = 0;
+				gameState.userInput = '';
 
-			// Update accuracy and errors
-			const targetChar = currentText[userInputText.length - 1];
-			if (inputChar === targetChar) {
-				// Correct input, no action needed
+				if (gameState.currentWordIndex >= gameState.currentText.length) {
+					stopGame();
+				}
 			} else {
-				// Increment errors if the character doesn't match
-				errors++;
+				gameState.errors++;
 			}
-
-			// Check if user has completed the text
-			if (userInputText.length === currentText.length) {
-				stopGame();
+		} else if (key.length === 1) {
+			const expectedChar = currentWord[gameState.currentCharIndex];
+			if (key === expectedChar) {
+				gameState.currentCharIndex++;
+			} else {
+				gameState.errors++;
 			}
+			gameState.userInput += key;
+		} else if (key === 'Backspace') {
+			if (gameState.currentCharIndex > 0) {
+				gameState.currentCharIndex--;
+			}
+			gameState.userInput = gameState.userInput.slice(0, -1);
 		}
 
-		// If the key is "Backspace", allow deletion from user input
-		if (e.key === 'Backspace') {
-			userInputText = userInputText.slice(0, -1);
-		}
+		updateAccuracy();
 	}
 
-	// Init the game
+	function updateAccuracy() {
+		const totalChars =
+			gameState.currentText.slice(0, gameState.currentWordIndex).join(' ').length +
+			gameState.currentCharIndex;
+		gameState.accuracy = Math.round(((totalChars - gameState.errors) / totalChars) * 100);
+	}
+
+	// Initialize the game
 	startGame();
-	$inspect(userInputText);
-	$effect(() => {
-		if (currentText.trim() === userInputText.trim()) {
-			stopGame();
-		}
-	});
 </script>
 
 <main class="h-full bg-zinc-900 pt-10 text-gray-200">
 	<div class="mx-auto max-w-4xl">
 		<h1 class="text-center text-3xl text-orange-400">Typing Ninja</h1>
-		<Timer {timeElapsed} {timerInterval} />
-		<TextDisplay {currentText} {userInputText} />
-		<button onclick={stopGame}>Stop</button>
+		<Timer timeElapsed={gameState.timeElapsed} {timerInterval} />
+		<TextDisplay
+			currentText={gameState.currentText}
+			userInput={gameState.userInput}
+			currentWordIndex={gameState.currentWordIndex}
+			currentCharIndex={gameState.currentCharIndex}
+		/>
+		<div class="mt-4 flex justify-center space-x-4">
+			<button class="rounded bg-orange-500 px-4 py-2 text-white" onclick={startGame}>Start</button>
+			<button class="rounded bg-red-500 px-4 py-2 text-white" onclick={stopGame}>Stop</button>
+			<button class="rounded bg-blue-500 px-4 py-2 text-white" onclick={resetGame}>Reset</button>
+		</div>
+		<div class="mt-4 text-center">
+			<p>WPM: {gameState.wpm}</p>
+			<p>Accuracy: {gameState.accuracy}%</p>
+		</div>
 	</div>
 </main>
 
