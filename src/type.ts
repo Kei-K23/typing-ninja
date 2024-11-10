@@ -1,10 +1,12 @@
 export type GameState = {
 	isPlaying: boolean;
+	isFinish: boolean;
 	currentText: string[];
-	userInputText: string;
-	currentIndex: number;
-	wpm: number;
+	currentWordIndex: number;
+	userInput: string[];
 	accuracy: number;
-	errors: number;
+	wpm: number;
+	correctChars: number;
+	totalChars: number;
 	timeElapsed: number;
 };
