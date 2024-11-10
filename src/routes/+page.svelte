@@ -69,6 +69,7 @@
 		};
 	};
 
+	// TODO : Handle and prevent not to move to previous word, when previous work is already correct
 	function onHandleUserInputKeyDown(e: KeyboardEvent) {
 		if (!gameState.isPlaying) return;
 
@@ -126,24 +127,14 @@
 	startGame();
 </script>
 
-<main class="h-full bg-zinc-900 pt-10 text-gray-200">
-	<div class="mx-auto max-w-4xl">
-		<h1 class="text-center text-3xl text-orange-400">Typing Ninja</h1>
+<main class="flex h-full bg-zinc-800 pt-10 text-gray-200">
+	<div class="mx-auto mt-36 max-w-5xl">
 		<Timer timeElapsed={gameState.timeElapsed} {timerInterval} />
 		<TextDisplay
 			currentText={gameState.currentText}
 			userInput={gameState.userInput}
 			currentWordIndex={gameState.currentWordIndex}
 		/>
-		<!-- <div class="mt-4 flex justify-center space-x-4">
-			<button class="rounded bg-orange-500 px-4 py-2 text-white" onclick={startGame}>Start</button>
-			<button class="rounded bg-red-500 px-4 py-2 text-white" onclick={stopGame}>Stop</button>
-			<button class="rounded bg-blue-500 px-4 py-2 text-white" onclick={resetGame}>Reset</button>
-		</div> -->
-		<div class="mt-4 text-center">
-			<p>WPM: {gameState.wpm}</p>
-			<p>Accuracy: {gameState.accuracy}%</p>
-		</div>
 	</div>
 </main>
 

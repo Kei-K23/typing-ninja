@@ -28,21 +28,22 @@
 	});
 </script>
 
-<div class="mt-4 text-2xl leading-relaxed">
+<div class="mt-4 text-4xl leading-relaxed">
 	{#each wordsWithStatus as word, wordIndex}
-		<span class="mr-2 inline-block">
-			{#each word as { char, status }}
-				<span
-					class:text-gray-500={status === 'past'}
-					class:text-green-500={status === 'correct'}
-					class:text-red-500={status === 'incorrect'}
-					class:text-yellow-500={status === 'pending'}
-					class:bg-gray-700={status === 'current'}>{char}</span
-				>
-			{/each}
-			{#if userInput[wordIndex]?.length > word.length}
-				<span class="text-red-500">{userInput[wordIndex].slice(word.length)}</span>
-			{/if}
+		<span class="mr-4 inline-block font-mono">
+			<span class="flex items-center">
+				{#each word as { char, status }}
+					<span
+						class:text-gray-200={status === 'correct'}
+						class:text-red-500={status === 'incorrect'}
+						class:text-gray-400={status === 'pending'}
+						class:bg-gray-700={status === 'current'}>{char}</span
+					>
+				{/each}
+				{#if userInput[wordIndex]?.length > word.length}
+					<span class="text-red-500/60">{userInput[wordIndex].slice(word.length)}</span>
+				{/if}
+			</span>
 		</span>
 	{/each}
 </div>
