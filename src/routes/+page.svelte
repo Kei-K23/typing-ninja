@@ -7,11 +7,11 @@
 		isPlaying: false,
 		currentText: [] as string[],
 		currentWordIndex: 0,
-		currentCharIndex: 0,
 		userInput: '',
-		accuracy: 0,
+		accuracy: 100,
 		wpm: 0,
-		errors: 0,
+		correctChars: 0,
+		totalChars: 0,
 		timeElapsed: 0
 	});
 
@@ -35,7 +35,7 @@
 
 	const updateWPM = () => {
 		const minutes = gameState.timeElapsed / 60;
-		const wordsTyped = gameState.currentWordIndex;
+		const wordsTyped = gameState.correctChars / 5; // Assuming average word length of 5 characters
 		gameState.wpm = Math.round(wordsTyped / minutes);
 	};
 
@@ -44,8 +44,8 @@
 		gameState.isPlaying = true;
 		gameState.userInput = '';
 		gameState.currentWordIndex = 0;
-		gameState.currentCharIndex = 0;
-		gameState.errors = 0;
+		gameState.correctChars = 0;
+		gameState.totalChars = 0;
 		gameState.accuracy = 100;
 		startTimer();
 	};
@@ -62,10 +62,10 @@
 			...gameState,
 			userInput: '',
 			currentWordIndex: 0,
-			currentCharIndex: 0,
 			accuracy: 100,
 			wpm: 0,
-			errors: 0
+			correctChars: 0,
+			totalChars: 0
 		};
 	};
 
@@ -76,40 +76,45 @@
 		const currentWord = gameState.currentText[gameState.currentWordIndex];
 
 		if (key === ' ') {
-			if (gameState.userInput.trim() === currentWord) {
-				gameState.currentWordIndex++;
-				gameState.currentCharIndex = 0;
-				gameState.userInput = '';
+			// Move to next word regardless of correctness
+			gameState.currentWordIndex++;
+			gameState.userInput = '';
 
-				if (gameState.currentWordIndex >= gameState.currentText.length) {
-					stopGame();
-				}
-			} else {
-				gameState.errors++;
+			if (gameState.currentWordIndex >= gameState.currentText.length) {
+				stopGame();
 			}
 		} else if (key.length === 1) {
-			const expectedChar = currentWord[gameState.currentCharIndex];
-			if (key === expectedChar) {
-				gameState.currentCharIndex++;
-			} else {
-				gameState.errors++;
-			}
+			// Add character to user input
 			gameState.userInput += key;
-		} else if (key === 'Backspace') {
-			if (gameState.currentCharIndex > 0) {
-				gameState.currentCharIndex--;
+			gameState.totalChars++;
+
+			// Check if the character is correct
+			if (
+				gameState.userInput.length <= currentWord.length &&
+				key === currentWord[gameState.userInput.length - 1]
+			) {
+				gameState.correctChars++;
 			}
-			gameState.userInput = gameState.userInput.slice(0, -1);
+		} else if (key === 'Backspace') {
+			// Remove last character from user input
+			if (gameState.userInput.length > 0) {
+				const lastChar = gameState.userInput[gameState.userInput.length - 1];
+				const expectedChar = currentWord[gameState.userInput.length - 1];
+
+				gameState.userInput = gameState.userInput.slice(0, -1);
+				gameState.totalChars--;
+
+				if (lastChar === expectedChar) {
+					gameState.correctChars--;
+				}
+			}
 		}
 
 		updateAccuracy();
 	}
 
 	function updateAccuracy() {
-		const totalChars =
-			gameState.currentText.slice(0, gameState.currentWordIndex).join(' ').length +
-			gameState.currentCharIndex;
-		gameState.accuracy = Math.round(((totalChars - gameState.errors) / totalChars) * 100);
+		gameState.accuracy = Math.round((gameState.correctChars / gameState.totalChars) * 100) || 100;
 	}
 
 	// Initialize the game
@@ -124,7 +129,6 @@
 			currentText={gameState.currentText}
 			userInput={gameState.userInput}
 			currentWordIndex={gameState.currentWordIndex}
-			currentCharIndex={gameState.currentCharIndex}
 		/>
 		<div class="mt-4 flex justify-center space-x-4">
 			<button class="rounded bg-orange-500 px-4 py-2 text-white" onclick={startGame}>Start</button>
