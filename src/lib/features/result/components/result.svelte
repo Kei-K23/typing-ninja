@@ -4,10 +4,10 @@
 	interface Props {
 		gameStates: GameState;
 		timerInterval: number;
-		startGame: () => void;
+		initGame: () => void;
 	}
 
-	let { gameStates, timerInterval, startGame }: Props = $props();
+	let { gameStates, timerInterval, initGame }: Props = $props();
 
 	// Reset the game with default value
 	const resetGame = () => {
@@ -15,26 +15,26 @@
 		clearInterval(timerInterval);
 
 		// Start the Game again
-		startGame();
+		initGame();
 	};
 </script>
 
 <div class="mx-auto mt-36 w-full max-w-xl">
 	<div class="grid grid-cols-2 gap-7">
 		<div
-			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700"
+			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700/80"
 		>
 			<h3 class="text-2xl">WPM</h3>
 			<span class="text-6xl text-yellow-500">{gameStates.wpm}</span>
 		</div>
 		<div
-			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700"
+			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700/80"
 		>
 			<h3 class="text-2xl">Accuracy</h3>
 			<span class="text-6xl text-yellow-500">{gameStates.accuracy}%</span>
 		</div>
 		<div
-			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700"
+			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700/80"
 		>
 			<h3 class="text-2xl">Characters</h3>
 			<div>
@@ -43,7 +43,7 @@
 			</div>
 		</div>
 		<div
-			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700"
+			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700/80"
 		>
 			<h3 class="text-2xl">Times</h3>
 			<p>

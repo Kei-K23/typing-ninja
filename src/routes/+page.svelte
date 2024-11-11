@@ -8,6 +8,7 @@
 	let gameStates = $state<GameState>({
 		isPlaying: false,
 		isFinish: false,
+		isPending: true,
 		currentText: [],
 		currentWordIndex: 0,
 		userInput: [],
@@ -15,7 +16,8 @@
 		wpm: 0,
 		correctChars: 0,
 		totalChars: 0,
-		timeElapsed: 0
+		timeElapsed: 0,
+		totalGenerateWords: 25
 	});
 
 	let timerInterval = $state(0);
@@ -31,53 +33,45 @@
 		clearInterval(timerInterval);
 	};
 
-	const resetTimer = () => {
-		gameStates.timeElapsed = 0;
-		clearInterval(timerInterval);
-	};
-
 	const updateWPM = () => {
 		const minutes = gameStates.timeElapsed / 60;
 		const wordsTyped = gameStates.correctChars / 5; // Assuming average word length of 5 characters
 		gameStates.wpm = Math.round(wordsTyped / minutes);
 	};
 
-	const startGame = () => {
-		gameStates.currentText = generateRandomText();
-		gameStates.isPlaying = true;
+	const initGame = () => {
+		gameStates.currentText = generateRandomText(gameStates.totalGenerateWords);
+		gameStates.isPlaying = false;
 		gameStates.isFinish = false;
+		gameStates.isPending = true;
 		gameStates.userInput = gameStates.currentText.map(() => '');
 		gameStates.currentWordIndex = 0;
 		gameStates.correctChars = 0;
 		gameStates.totalChars = 0;
 		gameStates.accuracy = 100;
 		gameStates.timeElapsed = 0;
-		startTimer();
+	};
+
+	const startGame = () => {
+		gameStates.isPending = false;
+		gameStates.isPlaying = true;
 	};
 
 	const stopGame = () => {
 		gameStates.isPlaying = false;
 		gameStates.isFinish = true;
+		gameStates.isPending = false;
 		stopTimer();
-	};
-
-	const resetGame = () => {
-		stopGame();
-		resetTimer();
-		gameStates = {
-			...gameStates,
-			userInput: [],
-			isPlaying: false,
-			currentWordIndex: 0,
-			accuracy: 100,
-			wpm: 0,
-			correctChars: 0,
-			totalChars: 0
-		};
 	};
 
 	// TODO : Handle and prevent not to move to previous word, when previous work is already correct
 	function onHandleUserInputKeyDown(e: KeyboardEvent) {
+		// Start the game, when the use first press any key
+		if (!gameStates.isPlaying && gameStates.isPending) {
+			startGame();
+			startTimer();
+		}
+
 		if (!gameStates.isPlaying) return;
 
 		const key = e.key;
@@ -131,22 +125,31 @@
 		gameStates.accuracy =
 			Math.round((gameStates.correctChars / gameStates.totalChars) * 100) || 100;
 	}
-	// Initialize the game
-	startGame();
+
+	// Init the game state
+	initGame();
 </script>
 
 <main class="flex h-full bg-zinc-800 pt-10 font-mono text-gray-200">
 	{#if !gameStates.isFinish}
 		<div class="mx-auto mt-36 max-w-6xl">
-			<Timer timeElapsed={gameStates.timeElapsed} {timerInterval} />
+			<Timer
+				isPending={gameStates.isPending}
+				timeElapsed={gameStates.timeElapsed}
+				{timerInterval}
+			/>
+
 			<TextDisplay
 				currentText={gameStates.currentText}
 				userInput={gameStates.userInput}
 				currentWordIndex={gameStates.currentWordIndex}
 			/>
+			{#if gameStates.isPending}
+				<p class="mt-10 animate-pulse text-center text-xl text-gray-400">Press any key to start</p>
+			{/if}
 		</div>
 	{:else}
-		<Result {startGame} {gameStates} {timerInterval} />
+		<Result {initGame} {gameStates} {timerInterval} />
 	{/if}
 </main>
 
