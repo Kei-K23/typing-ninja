@@ -56,7 +56,10 @@
 		gameStates.correctChars = 0;
 		gameStates.totalChars = 0;
 		gameStates.accuracy = 100;
-		gameStates.timeElapsed = 0;
+		if (gameStates.mode === 'time') {
+			gameStates.timeElapsed = 15;
+			gameStates.timeElapsedMode = 15;
+		}
 	};
 
 	const startGame = () => {
@@ -149,8 +152,9 @@
 <main class="flex h-full flex-col bg-zinc-800 pt-10 font-mono text-gray-200">
 	{#if !gameStates.isFinish}
 		<div class="mx-auto mb-10 mt-36 max-w-6xl">
+			<p>{gameStates.mode}</p>
 			{#if gameStates.isPending}
-				<Filter {gameStates} />
+				<Filter bind:gameStates />
 			{/if}
 			<Timer
 				isPending={gameStates.isPending}
