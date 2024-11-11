@@ -135,7 +135,7 @@
 	startGame();
 </script>
 
-<main class="flex h-full bg-zinc-800 pt-10 text-gray-200">
+<main class="flex h-full bg-zinc-800 pt-10 font-mono text-gray-200">
 	{#if !gameStates.isFinish}
 		<div class="mx-auto mt-36 max-w-6xl">
 			<Timer timeElapsed={gameStates.timeElapsed} {timerInterval} />
