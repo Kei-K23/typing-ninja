@@ -18,14 +18,20 @@
 		correctChars: 0,
 		totalChars: 0,
 		timeElapsed: 0,
-		totalGenerateWords: 25
+		timeElapsedMode: 15,
+		totalGenerateWords: 25,
+		mode: 'words'
 	});
 
 	let timerInterval = $state(0);
 
 	const startTimer = () => {
 		timerInterval = setInterval(() => {
-			gameStates.timeElapsed++;
+			if (gameStates.mode === 'time') {
+				gameStates.timeElapsed--;
+			} else if (gameStates.mode === 'words') {
+				gameStates.timeElapsed++;
+			}
 			updateWPM();
 		}, 1000);
 	};
@@ -35,9 +41,9 @@
 	};
 
 	const updateWPM = () => {
-		const minutes = gameStates.timeElapsed / 60;
+		const minutes = (15 - gameStates.timeElapsed) / 60;
 		const wordsTyped = gameStates.correctChars / 5; // Assuming average word length of 5 characters
-		gameStates.wpm = Math.round(wordsTyped / minutes);
+		gameStates.wpm = minutes > 0 ? Math.round(wordsTyped / minutes) : 0;
 	};
 
 	const initGame = () => {
@@ -127,13 +133,25 @@
 			Math.round((gameStates.correctChars / gameStates.totalChars) * 100) || 100;
 	}
 
+	$effect(() => {
+		if (gameStates.mode !== 'time') return;
+
+		if (gameStates.timeElapsed === 0) {
+			// Stop the game here
+			stopGame();
+		}
+	});
+
 	// Init the game state
 	initGame();
 </script>
 
-<main class="flex h-full bg-zinc-800 pt-10 font-mono text-gray-200">
+<main class="flex h-full flex-col bg-zinc-800 pt-10 font-mono text-gray-200">
 	{#if !gameStates.isFinish}
-		<div class="mx-auto mt-36 max-w-6xl">
+		<div class="mx-auto mb-10 mt-36 max-w-6xl">
+			{#if gameStates.isPending}
+				<Filter {gameStates} />
+			{/if}
 			<Timer
 				isPending={gameStates.isPending}
 				timeElapsed={gameStates.timeElapsed}
@@ -146,7 +164,6 @@
 				currentWordIndex={gameStates.currentWordIndex}
 			/>
 			{#if gameStates.isPending}
-				<Filter {gameStates} />
 				<p class="mt-10 animate-pulse text-center text-xl text-gray-400">Press any key to start</p>
 			{/if}
 		</div>

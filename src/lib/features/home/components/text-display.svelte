@@ -28,7 +28,7 @@
 	});
 </script>
 
-<div class="mt-4 text-4xl leading-relaxed">
+<div class="mt-4 max-h-[250px] overflow-auto text-4xl leading-relaxed">
 	{#each wordsWithStatus as word, wordIndex}
 		<span class="mr-4 inline-block font-mono">
 			<span class="flex items-center">

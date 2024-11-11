@@ -28,10 +28,15 @@
 	}
 </script>
 
-<div>
-	<div class="">
-		<button onclick={() => selectFilter('words')}> Words </button>
+<div
+	class="absolute left-1/2 top-20 flex -translate-x-1/2 items-center gap-x-2 rounded-lg bg-neutral-700/60 px-5 py-1.5 text-white"
+>
+	<div>
+		<div class:text-yellow-500={selectedFilter === 'words'}>
+			<button onclick={() => selectFilter('words')}> Words </button>
+		</div>
 	</div>
+	<div>|</div>
 	{#if selectedFilter === 'words'}
 		<div class="flex items-center gap-x-2">
 			{#each filter.words.filters as wordCount}

@@ -47,9 +47,9 @@
 		>
 			<h3 class="text-2xl">Times</h3>
 			<p>
-				<span class="text-6xl text-yellow-500">{gameStates.timeElapsed}</span><span
-					class="text-5xl text-yellow-500">s</span
-				>
+				<span class="text-6xl text-yellow-500"
+					>{gameStates.mode === 'time' ? gameStates.timeElapsedMode : gameStates.timeElapsed}</span
+				><span class="text-5xl text-yellow-500">s</span>
 			</p>
 		</div>
 	</div>

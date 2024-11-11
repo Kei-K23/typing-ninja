@@ -10,5 +10,7 @@ export type GameState = {
 	correctChars: number;
 	totalChars: number;
 	timeElapsed: number;
+	timeElapsedMode: number;
 	totalGenerateWords: number;
+	mode: 'time' | 'words';
 };
