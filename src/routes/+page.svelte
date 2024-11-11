@@ -3,7 +3,8 @@
 	import TextDisplay from '$lib/features/home/components/text-display.svelte';
 	import Timer from '$lib/features/home/components/timer.svelte';
 	import type { GameState } from '../type';
-	import Result from '$lib/features/result/components/result.svelte';
+	import Result from '$lib/features/home/components/result.svelte';
+	import Filter from '$lib/features/home/components/filter.svelte';
 
 	let gameStates = $state<GameState>({
 		isPlaying: false,
@@ -145,6 +146,7 @@
 				currentWordIndex={gameStates.currentWordIndex}
 			/>
 			{#if gameStates.isPending}
+				<Filter {gameStates} />
 				<p class="mt-10 animate-pulse text-center text-xl text-gray-400">Press any key to start</p>
 			{/if}
 		</div>
