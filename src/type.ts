@@ -2,6 +2,7 @@ export type GameState = {
 	isPlaying: boolean;
 	isFinish: boolean;
 	isPending: boolean;
+	isShowKeyboard: boolean;
 	currentText: string[];
 	currentWordIndex: number;
 	userInput: string[];

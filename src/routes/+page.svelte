@@ -6,11 +6,9 @@
 	import Result from '$lib/features/home/components/result.svelte';
 	import Filter from '$lib/features/home/components/filter.svelte';
 	import Tooltip from '$lib/components/ui/tooltip.svelte';
+	import KeyboardDisplay from '$lib/features/home/components/keyboard-display.svelte';
 
 	let gameStates = $state<GameState>({
-		isPlaying: false,
-		isFinish: false,
-		isPending: true,
 		currentText: [],
 		currentWordIndex: 0,
 		userInput: [],
@@ -21,9 +19,13 @@
 		timeElapsed: 0,
 		timeElapsedMode: 15,
 		totalGenerateWords: 25,
-		mode: 'words'
+		mode: 'words',
+		isPlaying: false,
+		isFinish: false,
+		isPending: true,
+		isShowKeyboard: true
 	});
-
+	let recentKeys: string[] = $state([]);
 	let timerInterval = $state(0);
 
 	const startTimer = () => {
@@ -54,6 +56,7 @@
 		gameStates.isPlaying = false;
 		gameStates.isFinish = false;
 		gameStates.isPending = true;
+		gameStates.isShowKeyboard = true;
 		gameStates.currentWordIndex = 0;
 		gameStates.correctChars = 0;
 		gameStates.totalChars = 0;
@@ -91,6 +94,12 @@
 		if (!gameStates.isPlaying) return;
 
 		const key = e.key;
+
+		// Add the pressed key to recentKeys
+		if (key.length === 1 || key === 'Backspace' || key === 'Space') {
+			recentKeys = [...recentKeys, key === ' ' ? 'Space' : key];
+		}
+
 		const currentWord = gameStates.currentText[gameStates.currentWordIndex];
 		let currentInput = gameStates.userInput[gameStates.currentWordIndex];
 
@@ -179,9 +188,12 @@
 				</div>
 			{/if}
 		</div>
+		{#if gameStates.isPlaying && gameStates.isShowKeyboard}
+			<KeyboardDisplay {recentKeys} />
+		{/if}
 	{:else}
 		<Result {timerInterval} {initGame} {gameStates} />
 	{/if}
 </main>
 
-<svelte:window on:keydown|preventDefault={onHandleUserInputKeyDown} />
+<svelte:window on:keydown={onHandleUserInputKeyDown} />
