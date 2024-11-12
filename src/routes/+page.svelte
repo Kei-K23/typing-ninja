@@ -118,6 +118,17 @@
 			gameStates.userInput[gameStates.currentWordIndex] = currentInput;
 			gameStates.totalChars++;
 
+			if (gameStates.mode === 'words') {
+				if (gameStates.currentWordIndex === gameStates.userInput.length - 1) {
+					if (
+						gameStates.currentText[gameStates.currentWordIndex].length ===
+						gameStates.userInput[gameStates.userInput.length - 1].length
+					) {
+						stopGame();
+					}
+				}
+			}
+
 			if (
 				currentInput.length <= currentWord.length &&
 				key === currentWord[currentInput.length - 1]
