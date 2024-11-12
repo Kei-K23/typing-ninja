@@ -8,6 +8,7 @@
 	import Tooltip from '$lib/components/ui/tooltip.svelte';
 	import KeyboardDisplay from '$lib/features/home/components/keyboard-display.svelte';
 	import { themes } from '$lib/data';
+	import Header from '$lib/components/header.svelte';
 
 	let gameStates = $state<GameState>({
 		currentText: [],
@@ -197,50 +198,51 @@
 	<meta name="twitter:image" content={''} />
 </svelte:head>
 
-<main
-	class="flex h-full flex-col {gameTheme.backgroundColor} pt-10 font-mono {gameTheme.textColor}"
->
-	{#if !gameStates.isFinish}
-		<div class="mx-auto mb-10 mt-32 max-w-6xl">
-			{#if gameStates.isPending}
-				<Filter bind:gameStates bind:gameTheme />
-			{/if}
-			<Timer isPending={gameStates.isPending} timeElapsed={gameStates.timeElapsed} />
+<main class="flex h-full flex-col {gameTheme.backgroundColor}  font-mono {gameTheme.textColor}">
+	<div class="flex flex-col">
+		{#if !gameStates.isFinish}
+			<Header isPending={gameStates.isPending} />
+			<div class="mx-auto mb-10 mt-28 max-w-6xl">
+				{#if gameStates.isPending}
+					<Filter bind:gameStates bind:gameTheme />
+				{/if}
+				<Timer isPending={gameStates.isPending} timeElapsed={gameStates.timeElapsed} />
 
-			<TextDisplay
-				{gameTheme}
-				currentText={gameStates.currentText}
-				userInput={gameStates.userInput}
-				currentWordIndex={gameStates.currentWordIndex}
-			/>
-			{#if gameStates.isPending}
-				<div class="mt-10 flex flex-col items-center justify-center gap-y-5">
-					{#if gameStates.mode === 'words'}
-						<Tooltip position="top" {gameTheme}>
-							<button
-								onclick={() => {
-									gameStates.currentText = generateRandomText(gameStates.totalGenerateWords);
-								}}
-							>
-								<img src="/restart_icon.svg" alt="restart_icon" class="size-8" />
-							</button>
-							{#snippet content()}
-								<p class={gameTheme.accentColor}>Restart Text</p>
-							{/snippet}
-						</Tooltip>
-					{/if}
-					<p class="animate-pulse text-center text-xl {gameTheme.textColor}">
-						Press any key to start
-					</p>
-				</div>
+				<TextDisplay
+					{gameTheme}
+					currentText={gameStates.currentText}
+					userInput={gameStates.userInput}
+					currentWordIndex={gameStates.currentWordIndex}
+				/>
+				{#if gameStates.isPending}
+					<div class="mt-10 flex flex-col items-center justify-center gap-y-5">
+						{#if gameStates.mode === 'words'}
+							<Tooltip position="top" {gameTheme}>
+								<button
+									onclick={() => {
+										gameStates.currentText = generateRandomText(gameStates.totalGenerateWords);
+									}}
+								>
+									<img src="/restart_icon.svg" alt="restart_icon" class="size-8" />
+								</button>
+								{#snippet content()}
+									<p class={gameTheme.accentColor}>Restart Text</p>
+								{/snippet}
+							</Tooltip>
+						{/if}
+						<p class="animate-pulse text-center text-xl {gameTheme.textColor}">
+							Press any key to start
+						</p>
+					</div>
+				{/if}
+			</div>
+			{#if gameStates.isPlaying && gameStates.isShowKeyboard}
+				<KeyboardDisplay {gameTheme} {recentKeys} />
 			{/if}
-		</div>
-		{#if gameStates.isPlaying && gameStates.isShowKeyboard}
-			<KeyboardDisplay {gameTheme} {recentKeys} />
+		{:else}
+			<Result {timerInterval} {initGame} {gameStates} {gameTheme} />
 		{/if}
-	{:else}
-		<Result {timerInterval} {initGame} {gameStates} {gameTheme} />
-	{/if}
+	</div>
 </main>
 
 <svelte:window on:keydown={onHandleUserInputKeyDown} />

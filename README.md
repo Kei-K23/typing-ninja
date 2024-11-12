@@ -2,7 +2,9 @@
 
 Typing Ninja is a open-source testing web application with minimalistic design and customization.
 
-❗️Currently Typing Ninja is highly under development❗️
+Try Typing-Ninja:
+
+![site_image](/static/site_img.png)
 
 ## Tech stack
 

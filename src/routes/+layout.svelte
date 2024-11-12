@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import type { Snippet } from 'svelte';
 	import '../app.css';
-	import type { LayoutData } from './$types';
 
 	interface Props {
 		children: Snippet;
