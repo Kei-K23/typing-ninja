@@ -1,13 +1,15 @@
 <script lang="ts">
+	import type { Theme } from '$lib/data';
 	import type { GameState } from '../../../../type';
 
 	interface Props {
 		gameStates: GameState;
+		gameTheme: Theme;
 		timerInterval: number;
 		initGame: () => void;
 	}
 
-	let { gameStates, timerInterval, initGame }: Props = $props();
+	let { gameStates, timerInterval, gameTheme, initGame }: Props = $props();
 
 	// Reset the game with default value
 	const resetGame = () => {
@@ -22,19 +24,19 @@
 <div class="mx-auto mt-36 w-full max-w-xl">
 	<div class="grid grid-cols-2 gap-7">
 		<div
-			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700/80"
+			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl {gameTheme.opacityAccentBackgroundColor} p-5 transition-all hover:shadow-lg"
 		>
 			<h3 class="text-2xl">WPM</h3>
 			<span class="text-6xl text-yellow-500">{gameStates.wpm}</span>
 		</div>
 		<div
-			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700/80"
+			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg {gameTheme.opacityAccentBackgroundColor}"
 		>
 			<h3 class="text-2xl">Accuracy</h3>
 			<span class="text-6xl text-yellow-500">{gameStates.accuracy}%</span>
 		</div>
 		<div
-			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700/80"
+			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg {gameTheme.opacityAccentBackgroundColor}"
 		>
 			<h3 class="text-2xl">Characters</h3>
 			<div>
@@ -43,7 +45,7 @@
 			</div>
 		</div>
 		<div
-			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg hover:shadow-neutral-700/80"
+			class="flex flex-col items-center justify-center gap-y-2 rounded-2xl bg-neutral-900/60 p-5 transition-all hover:shadow-lg {gameTheme.opacityAccentBackgroundColor}"
 		>
 			<h3 class="text-2xl">Times</h3>
 			<p>
@@ -55,7 +57,7 @@
 	</div>
 	<div class="mt-10 flex items-center justify-center">
 		<button
-			class="rounded-lg bg-neutral-600 px-5 py-1.5 text-white hover:bg-neutral-700 hover:text-white/80"
+			class="rounded-lg px-5 py-1.5 {gameTheme.accentBgColor} {gameTheme.textColor} transition-all hover:scale-105 active:scale-95"
 			onclick={resetGame}>Restart Game</button
 		>
 	</div>

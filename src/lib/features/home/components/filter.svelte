@@ -1,12 +1,15 @@
 <script lang="ts">
+	import ThemeSwitcher from '$lib/components/ui/theme-switcher.svelte';
+	import type { Theme } from '$lib/data';
 	import { generateRandomText } from '$lib/utils';
 	import type { GameState } from '../../../../type';
 
 	interface Props {
 		gameStates: GameState;
+		gameTheme: Theme;
 	}
 
-	let { gameStates = $bindable() }: Props = $props();
+	let { gameStates = $bindable(), gameTheme = $bindable() }: Props = $props();
 
 	// State for filters and current selection
 	let filter = $state({
@@ -45,62 +48,65 @@
 	}
 </script>
 
-<div
-	class="absolute left-1/2 top-20 flex -translate-x-1/2 items-center gap-x-2 rounded-lg bg-neutral-700/60 px-5 py-1.5 text-white"
->
+<div class="absolute left-1/2 top-20 flex -translate-x-1/2 items-center gap-x-3">
 	<div
-		class="transition-all hover:text-yellow-400"
-		class:text-yellow-500={gameStates.isShowKeyboard}
+		class="flex items-center gap-x-2 rounded-lg px-5 py-1.5 {gameTheme.textColor} {gameTheme.opacityAccentBackgroundColor}"
 	>
-		<button
-			onclick={() => {
-				gameStates.isShowKeyboard = !gameStates.isShowKeyboard;
-			}}
-		>
-			Show keyboard
-		</button>
-	</div>
-	<div>|</div>
-	<div class="flex items-center gap-x-2">
 		<div
 			class="transition-all hover:text-yellow-400"
-			class:text-yellow-500={gameStates.mode === 'words'}
+			class:text-yellow-500={gameStates.isShowKeyboard}
 		>
-			<button onclick={() => selectFilter('words')}> Words </button>
+			<button
+				onclick={() => {
+					gameStates.isShowKeyboard = !gameStates.isShowKeyboard;
+				}}
+			>
+				Show keyboard
+			</button>
 		</div>
-		<div
-			class="transition-all hover:text-yellow-400"
-			class:text-yellow-500={gameStates.mode === 'time'}
-		>
-			<button onclick={() => selectFilter('time')}> Time </button>
+		<div>|</div>
+		<div class="flex items-center gap-x-2">
+			<div
+				class="transition-all hover:text-yellow-400"
+				class:text-yellow-500={gameStates.mode === 'words'}
+			>
+				<button onclick={() => selectFilter('words')}> Words </button>
+			</div>
+			<div
+				class="transition-all hover:text-yellow-400"
+				class:text-yellow-500={gameStates.mode === 'time'}
+			>
+				<button onclick={() => selectFilter('time')}> Time </button>
+			</div>
 		</div>
+		<div>|</div>
+		{#if gameStates.mode === 'words'}
+			<div class="flex items-center gap-x-2">
+				{#each filter.words.filters as wordCount}
+					<button
+						class="transition-all hover:text-yellow-400"
+						class:text-yellow-500={wordCount === gameStates.totalGenerateWords}
+						onclick={() => {
+							gameStates.totalGenerateWords = wordCount;
+							updateGameState();
+						}}>{wordCount}</button
+					>
+				{/each}
+			</div>
+		{:else}
+			<div class="flex items-center gap-x-2">
+				{#each filter.time.filters as time}
+					<button
+						class="transition-all hover:text-yellow-400"
+						class:text-yellow-500={time === gameStates.timeElapsedMode}
+						onclick={() => {
+							gameStates.timeElapsedMode = time;
+							updateGameState();
+						}}>{time}</button
+					>
+				{/each}
+			</div>
+		{/if}
 	</div>
-	<div>|</div>
-	{#if gameStates.mode === 'words'}
-		<div class="flex items-center gap-x-2">
-			{#each filter.words.filters as wordCount}
-				<button
-					class="transition-all hover:text-yellow-400"
-					class:text-yellow-500={wordCount === gameStates.totalGenerateWords}
-					onclick={() => {
-						gameStates.totalGenerateWords = wordCount;
-						updateGameState();
-					}}>{wordCount}</button
-				>
-			{/each}
-		</div>
-	{:else}
-		<div class="flex items-center gap-x-2">
-			{#each filter.time.filters as time}
-				<button
-					class="transition-all hover:text-yellow-400"
-					class:text-yellow-500={time === gameStates.timeElapsedMode}
-					onclick={() => {
-						gameStates.timeElapsedMode = time;
-						updateGameState();
-					}}>{time}</button
-				>
-			{/each}
-		</div>
-	{/if}
+	<ThemeSwitcher bind:gameTheme />
 </div>

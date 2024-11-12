@@ -7,6 +7,7 @@
 	import Filter from '$lib/features/home/components/filter.svelte';
 	import Tooltip from '$lib/components/ui/tooltip.svelte';
 	import KeyboardDisplay from '$lib/features/home/components/keyboard-display.svelte';
+	import { themes } from '$lib/data';
 
 	let gameStates = $state<GameState>({
 		currentText: [],
@@ -25,6 +26,9 @@
 		isPending: true,
 		isShowKeyboard: true
 	});
+
+	let gameTheme = $state(themes[0]);
+
 	let recentKeys: string[] = $state([]);
 	let timerInterval = $state(0);
 
@@ -155,15 +159,18 @@
 	initGame();
 </script>
 
-<main class="flex h-full flex-col bg-zinc-800 pt-10 font-mono text-gray-200">
+<main
+	class="flex h-full flex-col {gameTheme.backgroundColor} pt-10 font-mono {gameTheme.textColor}"
+>
 	{#if !gameStates.isFinish}
 		<div class="mx-auto mb-10 mt-32 max-w-6xl">
 			{#if gameStates.isPending}
-				<Filter bind:gameStates />
+				<Filter bind:gameStates bind:gameTheme />
 			{/if}
 			<Timer isPending={gameStates.isPending} timeElapsed={gameStates.timeElapsed} />
 
 			<TextDisplay
+				{gameTheme}
 				currentText={gameStates.currentText}
 				userInput={gameStates.userInput}
 				currentWordIndex={gameStates.currentWordIndex}
@@ -171,7 +178,7 @@
 			{#if gameStates.isPending}
 				<div class="mt-10 flex flex-col items-center justify-center gap-y-5">
 					{#if gameStates.mode === 'words'}
-						<Tooltip position="top">
+						<Tooltip position="top" {gameTheme}>
 							<button
 								onclick={() => {
 									gameStates.currentText = generateRandomText(gameStates.totalGenerateWords);
@@ -180,19 +187,21 @@
 								<img src="/restart_icon.svg" alt="restart_icon" class="size-8" />
 							</button>
 							{#snippet content()}
-								<p class="text-yellow-500">Restart Text</p>
+								<p class={gameTheme.accentColor}>Restart Text</p>
 							{/snippet}
 						</Tooltip>
 					{/if}
-					<p class="animate-pulse text-center text-xl text-gray-400">Press any key to start</p>
+					<p class="animate-pulse text-center text-xl {gameTheme.textColor}">
+						Press any key to start
+					</p>
 				</div>
 			{/if}
 		</div>
 		{#if gameStates.isPlaying && gameStates.isShowKeyboard}
-			<KeyboardDisplay {recentKeys} />
+			<KeyboardDisplay {gameTheme} {recentKeys} />
 		{/if}
 	{:else}
-		<Result {timerInterval} {initGame} {gameStates} />
+		<Result {timerInterval} {initGame} {gameStates} {gameTheme} />
 	{/if}
 </main>
 

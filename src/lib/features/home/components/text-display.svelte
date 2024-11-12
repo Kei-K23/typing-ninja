@@ -1,11 +1,14 @@
 <script lang="ts">
+	import type { Theme } from '$lib/data';
+
 	interface Props {
 		currentText: string[];
 		userInput: string[];
 		currentWordIndex: number;
+		gameTheme: Theme;
 	}
 
-	let { currentText, userInput, currentWordIndex }: Props = $props();
+	let { currentText, userInput, currentWordIndex, gameTheme }: Props = $props();
 	let containerRef: HTMLDivElement | null = $state(null);
 	let wordRefs: HTMLSpanElement[] = $state([]);
 
@@ -51,18 +54,14 @@
 >
 	{#each wordsWithStatus as word, wordIndex}
 		<span
-			class="mr-4 inline-block font-mono"
-			class:bg-zinc-700={wordIndex === currentWordIndex}
-			class:rounded-md={wordIndex === currentWordIndex}
-			class:px-2={wordIndex === currentWordIndex}
-			class:py-1={wordIndex === currentWordIndex}
+			class="mr-4 inline-block font-mono {wordIndex === currentWordIndex &&
+				`${gameTheme.accentBackgroundColor} rounded-md px-2 py-1`}"
 			bind:this={wordRefs[wordIndex]}
 		>
 			<span class="relative flex items-center">
 				{#each word as { char, status }}
 					<span
-						class={`${status === 'current' && 'bg-yellow-500/40'}`}
-						class:text-gray-200={status === 'correct'}
+						class={`${status === 'current' && gameTheme.accentBgColor} ${status === 'correct' && gameTheme.textColor}`}
 						class:text-red-500={status === 'incorrect'}
 						class:text-gray-500={status === 'pending'}>{char}</span
 					>

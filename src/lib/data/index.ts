@@ -231,3 +231,62 @@ export const commonWords = [
 	'right',
 	'left'
 ];
+
+export type Theme = {
+	name: string;
+	backgroundColor: string;
+	accentBackgroundColor: string;
+	accentBorderColor: string;
+	opacityAccentBackgroundColor: string;
+	textColor: string;
+	accentTextColor: string;
+	accentColor: string;
+	accentBgColor: string;
+};
+
+export const themes: Theme[] = [
+	{
+		name: 'Default',
+		backgroundColor: 'bg-zinc-800',
+		accentBackgroundColor: 'bg-zinc-700',
+		accentBorderColor: 'border-zinc-700',
+		opacityAccentBackgroundColor: 'bg-zinc-700/60',
+		textColor: 'text-gray-200',
+		accentTextColor: 'text-gray-100',
+		accentColor: 'text-yellow-500',
+		accentBgColor: 'bg-yellow-500/40'
+	},
+	{
+		name: 'Light',
+		backgroundColor: 'bg-gray-200',
+		accentBackgroundColor: 'bg-gray-100',
+		accentBorderColor: 'border-gray-100',
+		opacityAccentBackgroundColor: 'bg-gray-100/60',
+		textColor: 'text-gray-800',
+		accentTextColor: 'text-gray-700',
+		accentColor: 'text-blue-600',
+		accentBgColor: 'bg-blue-600/40'
+	},
+	{
+		name: 'Dark Blue',
+		backgroundColor: 'bg-blue-900',
+		accentBackgroundColor: 'bg-blue-800',
+		accentBorderColor: 'border-blue-800',
+		opacityAccentBackgroundColor: 'bg-blue-800/60',
+		textColor: 'text-gray-200',
+		accentTextColor: 'text-gray-100',
+		accentColor: 'text-yellow-400',
+		accentBgColor: 'bg-yellow-400/60'
+	},
+	{
+		name: 'Forest',
+		backgroundColor: 'bg-green-900',
+		accentBackgroundColor: 'bg-green-800',
+		accentBorderColor: 'border-green-800',
+		opacityAccentBackgroundColor: 'bg-green-800/60',
+		textColor: 'text-emerald-200',
+		accentTextColor: 'text-emerald-100',
+		accentColor: 'text-yellow-300',
+		accentBgColor: 'bg-yellow-300/40'
+	}
+];

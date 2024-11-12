@@ -1,16 +1,25 @@
 <script lang="ts">
+	import type { Theme } from '$lib/data';
 	import type { Snippet } from 'svelte';
-	import { fade, scale, slide } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 
 	interface Props {
 		position?: 'top' | 'bottom' | 'left' | 'right';
 		delay?: number;
 		duration?: number;
+		gameTheme: Theme;
 		children: Snippet;
 		content: Snippet;
 	}
 
-	let { position = 'top', delay = 200, duration = 100, children, content }: Props = $props();
+	let {
+		position = 'top',
+		delay = 200,
+		duration = 100,
+		gameTheme,
+		children,
+		content
+	}: Props = $props();
 
 	let visible = $state(false);
 	let tooltipRef: HTMLDivElement | null = $state(null);
@@ -24,12 +33,10 @@
 	};
 
 	const arrows = {
-		top: 'bottom-[-8px] left-1/2 -translate-x-1/2 border-t-[8px] border-t-slate-700 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-0',
-		bottom:
-			'top-[-8px] left-1/2 -translate-x-1/2 rotate-180 border-t-[8px] border-t-slate-700 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-0',
-		left: 'right-[-8px] top-1/2 -translate-y-1/2 -rotate-180 border-l-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[8px] border-r-slate-700',
-		right:
-			'left-[-8px] top-1/2 -translate-y-1/2 rotate-180 border-r-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-l-[8px] border-l-slate-700'
+		top: `bottom-[-8px] left-1/2 -translate-x-1/2 border-t-[8px] border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-0`,
+		bottom: `top-[-8px] left-1/2 -translate-x-1/2 rotate-180 border-t-[8px]  border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-0`,
+		left: `right-[-8px] top-1/2 -translate-y-1/2 -rotate-180 border-l-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-r-[8px]`,
+		right: `left-[-8px] top-1/2 -translate-y-1/2 rotate-180 border-r-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-l-[8px]`
 	};
 
 	let timeoutId: number;
@@ -68,12 +75,15 @@
 		<div
 			bind:this={tooltipRef}
 			transition:fade={{ duration }}
-			class="absolute z-50 whitespace-nowrap rounded bg-slate-700 px-2 py-1 text-sm text-white shadow-lg {positions[
+			class="absolute z-50 whitespace-nowrap rounded px-2 py-1 text-sm shadow-lg {positions[
 				position
-			]}"
+			]} {gameTheme.accentBackgroundColor} {gameTheme.textColor}"
 			role="tooltip"
 		>
-			<div class="absolute h-0 w-0 border-4 {arrows[position]}" aria-hidden="true"></div>
+			<div
+				class="absolute h-0 w-0 border-4 {gameTheme.accentBorderColor} {arrows[position]}"
+				aria-hidden="true"
+			></div>
 			{@render content()}
 		</div>
 	{/if}
