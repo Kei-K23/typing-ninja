@@ -2,7 +2,7 @@
 
 Typing Ninja is a open-source testing web application with minimalistic design and customization.
 
-Try Typing-Ninja:
+Try Typing-Ninja: [https://typing-ninja-two.vercel.app](https://typing-ninja-two.vercel.app)
 
 ![site_image](/static/site_img.png)
 
