@@ -1,15 +1,10 @@
 <script lang="ts">
 	interface Props {
 		timeElapsed: number;
-		timerInterval: number;
 		isPending: boolean;
 	}
 
-	const { timeElapsed, timerInterval, isPending }: Props = $props();
-
-	$effect(() => {
-		return () => clearInterval(timerInterval);
-	});
+	const { timeElapsed, isPending }: Props = $props();
 </script>
 
 <div class="font-mono text-2xl" class:opacity-0={isPending}>

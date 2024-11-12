@@ -29,7 +29,7 @@
 		timerInterval = setInterval(() => {
 			if (gameStates.mode === 'time') {
 				gameStates.timeElapsed--;
-			} else if (gameStates.mode === 'words') {
+			} else {
 				gameStates.timeElapsed++;
 			}
 			updateWPM();
@@ -41,30 +41,38 @@
 	};
 
 	const updateWPM = () => {
-		const minutes = (15 - gameStates.timeElapsed) / 60;
+		const minutes =
+			gameStates.mode === 'time'
+				? (gameStates.timeElapsedMode - gameStates.timeElapsed) / 60
+				: gameStates.timeElapsed / 60;
 		const wordsTyped = gameStates.correctChars / 5; // Assuming average word length of 5 characters
 		gameStates.wpm = minutes > 0 ? Math.round(wordsTyped / minutes) : 0;
 	};
 
 	const initGame = () => {
-		gameStates.currentText = generateRandomText(gameStates.totalGenerateWords);
 		gameStates.isPlaying = false;
 		gameStates.isFinish = false;
 		gameStates.isPending = true;
-		gameStates.userInput = gameStates.currentText.map(() => '');
 		gameStates.currentWordIndex = 0;
 		gameStates.correctChars = 0;
 		gameStates.totalChars = 0;
 		gameStates.accuracy = 100;
-		if (gameStates.mode === 'time') {
-			gameStates.timeElapsed = 15;
-			gameStates.timeElapsedMode = 15;
+		gameStates.wpm = 0;
+
+		if (gameStates.mode === 'words') {
+			gameStates.currentText = generateRandomText(gameStates.totalGenerateWords);
+			gameStates.timeElapsed = 0;
+		} else {
+			gameStates.currentText = generateRandomText(100); // Generate a large number of words for time mode
+			gameStates.timeElapsed = gameStates.timeElapsedMode;
 		}
+		gameStates.userInput = gameStates.currentText.map(() => '');
 	};
 
 	const startGame = () => {
 		gameStates.isPending = false;
 		gameStates.isPlaying = true;
+		startTimer();
 	};
 
 	const stopGame = () => {
@@ -74,12 +82,9 @@
 		stopTimer();
 	};
 
-	// TODO : Handle and prevent not to move to previous word, when previous work is already correct
 	function onHandleUserInputKeyDown(e: KeyboardEvent) {
-		// Start the game, when the use first press any key
 		if (!gameStates.isPlaying && gameStates.isPending) {
 			startGame();
-			startTimer();
 		}
 
 		if (!gameStates.isPlaying) return;
@@ -89,20 +94,16 @@
 		let currentInput = gameStates.userInput[gameStates.currentWordIndex];
 
 		if (key === ' ') {
-			// Move to next word, preserving incorrect characters
 			if (gameStates.currentWordIndex < gameStates.currentText.length - 1) {
 				gameStates.currentWordIndex++;
-			} else {
-				// Stop the game here
+			} else if (gameStates.mode === 'words') {
 				stopGame();
 			}
 		} else if (key.length === 1) {
-			// Add character to user input
 			currentInput += key;
 			gameStates.userInput[gameStates.currentWordIndex] = currentInput;
 			gameStates.totalChars++;
 
-			// Check if the character is correct
 			if (
 				currentInput.length <= currentWord.length &&
 				key === currentWord[currentInput.length - 1]
@@ -110,7 +111,6 @@
 				gameStates.correctChars++;
 			}
 		} else if (key === 'Backspace') {
-			// Remove last character from user input
 			if (currentInput.length > 0) {
 				const lastChar = currentInput[currentInput.length - 1];
 				const expectedChar = currentWord[currentInput.length - 1];
@@ -123,7 +123,6 @@
 					gameStates.correctChars--;
 				}
 			} else if (gameStates.currentWordIndex > 0) {
-				// Move to previous word
 				gameStates.currentWordIndex--;
 			}
 		}
@@ -137,10 +136,7 @@
 	}
 
 	$effect(() => {
-		if (gameStates.mode !== 'time') return;
-
-		if (gameStates.timeElapsed === 0) {
-			// Stop the game here
+		if (gameStates.mode === 'time' && gameStates.timeElapsed === 0 && gameStates.isPlaying) {
 			stopGame();
 		}
 	});
@@ -151,16 +147,11 @@
 
 <main class="flex h-full flex-col bg-zinc-800 pt-10 font-mono text-gray-200">
 	{#if !gameStates.isFinish}
-		<div class="mx-auto mb-10 mt-36 max-w-6xl">
-			<p>{gameStates.mode}</p>
+		<div class="mx-auto mb-10 mt-32 max-w-6xl">
 			{#if gameStates.isPending}
 				<Filter bind:gameStates />
 			{/if}
-			<Timer
-				isPending={gameStates.isPending}
-				timeElapsed={gameStates.timeElapsed}
-				{timerInterval}
-			/>
+			<Timer isPending={gameStates.isPending} timeElapsed={gameStates.timeElapsed} />
 
 			<TextDisplay
 				currentText={gameStates.currentText}
@@ -168,11 +159,16 @@
 				currentWordIndex={gameStates.currentWordIndex}
 			/>
 			{#if gameStates.isPending}
-				<p class="mt-10 animate-pulse text-center text-xl text-gray-400">Press any key to start</p>
+				<div class="mt-10 flex flex-col items-center justify-center gap-y-5">
+					<button>
+						<img src="/restart_icon.svg" alt="restart_icon" class="size-8" />
+					</button>
+					<p class="animate-pulse text-center text-xl text-gray-400">Press any key to start</p>
+				</div>
 			{/if}
 		</div>
 	{:else}
-		<Result {initGame} {gameStates} {timerInterval} />
+		<Result {timerInterval} {initGame} {gameStates} />
 	{/if}
 </main>
 

@@ -11,69 +11,72 @@
 	// State for filters and current selection
 	let filter = $state({
 		words: {
-			selected: gameStates.totalGenerateWords,
-			filters: [10, 25, 50, 100]
+			filters: [10, 25, 50, 100, 200]
 		},
 		time: {
-			selected: 15,
-			filters: [15, 30, 60, 120]
+			filters: [15, 30, 60, 120, 130]
 		}
 	});
 
-	// Variable to track which filter type is selected ("time" or "words")
-	let selectedFilter: 'words' | 'time' | null = $state('words');
-
 	function selectFilter(type: 'words' | 'time') {
-		if (!selectedFilter) {
-			selectedFilter = type;
-		}
-
+		gameStates.mode = type;
 		if (type === 'words') {
-			gameStates.mode = 'words';
-		} else if (type === 'time') {
-			gameStates.mode = 'time';
-			// Default for time
-			gameStates.timeElapsed = 15;
-			gameStates.timeElapsedMode = 15;
+			gameStates.totalGenerateWords = filter.words.filters[0];
+		} else {
+			gameStates.timeElapsedMode = filter.time.filters[0];
 		}
+		updateGameState();
 	}
 
-	$inspect(selectedFilter);
+	function updateGameState() {
+		if (gameStates.mode === 'words') {
+			gameStates.currentText = generateRandomText(gameStates.totalGenerateWords);
+			gameStates.timeElapsed = 0;
+		} else {
+			gameStates.currentText = generateRandomText(200); // Generate a large number of words for time mode
+			gameStates.timeElapsed = gameStates.timeElapsedMode;
+		}
+		gameStates.userInput = gameStates.currentText.map(() => '');
+		gameStates.currentWordIndex = 0;
+		gameStates.correctChars = 0;
+		gameStates.totalChars = 0;
+		gameStates.accuracy = 100;
+		gameStates.wpm = 0;
+	}
 </script>
 
 <div
 	class="absolute left-1/2 top-20 flex -translate-x-1/2 items-center gap-x-2 rounded-lg bg-neutral-700/60 px-5 py-1.5 text-white"
 >
 	<div class="flex items-center gap-x-2">
-		<div class:text-yellow-500={selectedFilter === 'words'}>
+		<div class:text-yellow-500={gameStates.mode === 'words'}>
 			<button onclick={() => selectFilter('words')}> Words </button>
 		</div>
-		<div class:text-yellow-500={selectedFilter === 'time'}>
-			<button onclick={() => selectFilter('time')}> time </button>
+		<div class:text-yellow-500={gameStates.mode === 'time'}>
+			<button onclick={() => selectFilter('time')}> Time </button>
 		</div>
 	</div>
 	<div>|</div>
-	{#if selectedFilter === 'words'}
+	{#if gameStates.mode === 'words'}
 		<div class="flex items-center gap-x-2">
 			{#each filter.words.filters as wordCount}
 				<button
 					class:text-yellow-500={wordCount === gameStates.totalGenerateWords}
 					onclick={() => {
 						gameStates.totalGenerateWords = wordCount;
-						gameStates.currentText = generateRandomText(wordCount);
+						updateGameState();
 					}}>{wordCount}</button
 				>
 			{/each}
 		</div>
-	{/if}
-	{#if selectedFilter === 'time'}
+	{:else}
 		<div class="flex items-center gap-x-2">
 			{#each filter.time.filters as time}
 				<button
-					class:text-yellow-500={time === gameStates.totalGenerateWords}
+					class:text-yellow-500={time === gameStates.timeElapsedMode}
 					onclick={() => {
-						gameStates.totalGenerateWords = time;
-						gameStates.currentText = generateRandomText(time);
+						gameStates.timeElapsedMode = time;
+						updateGameState();
 					}}>{time}</button
 				>
 			{/each}
