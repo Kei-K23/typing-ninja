@@ -45,7 +45,10 @@
 	});
 </script>
 
-<div bind:this={containerRef} class="mt-4 max-h-[240px] overflow-hidden text-4xl leading-loose">
+<div
+	bind:this={containerRef}
+	class="mt-4 max-h-[240px] select-none overflow-hidden text-4xl leading-loose"
+>
 	{#each wordsWithStatus as word, wordIndex}
 		<span
 			class="mr-4 inline-block font-mono"

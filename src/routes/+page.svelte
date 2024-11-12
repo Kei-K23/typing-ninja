@@ -5,6 +5,7 @@
 	import type { GameState } from '../type';
 	import Result from '$lib/features/home/components/result.svelte';
 	import Filter from '$lib/features/home/components/filter.svelte';
+	import Tooltip from '$lib/components/ui/tooltip.svelte';
 
 	let gameStates = $state<GameState>({
 		isPlaying: false,
@@ -160,9 +161,20 @@
 			/>
 			{#if gameStates.isPending}
 				<div class="mt-10 flex flex-col items-center justify-center gap-y-5">
-					<button>
-						<img src="/restart_icon.svg" alt="restart_icon" class="size-8" />
-					</button>
+					{#if gameStates.mode === 'words'}
+						<Tooltip position="top">
+							<button
+								onclick={() => {
+									gameStates.currentText = generateRandomText(gameStates.totalGenerateWords);
+								}}
+							>
+								<img src="/restart_icon.svg" alt="restart_icon" class="size-8" />
+							</button>
+							{#snippet content()}
+								<p class="text-yellow-500">Restart Text</p>
+							{/snippet}
+						</Tooltip>
+					{/if}
 					<p class="animate-pulse text-center text-xl text-gray-400">Press any key to start</p>
 				</div>
 			{/if}
