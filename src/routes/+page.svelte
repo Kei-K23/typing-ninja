@@ -198,11 +198,13 @@
 	<meta name="twitter:image" content={'https://typing-ninja-two.vercel.app'} />
 </svelte:head>
 
-<main class="flex h-full flex-col {gameTheme.backgroundColor}  font-mono {gameTheme.textColor}">
+<main
+	class="flex h-full flex-col {gameTheme.backgroundColor}  font-mono {gameTheme.textColor} px-4"
+>
 	<div class="flex flex-col">
 		{#if !gameStates.isFinish}
 			<Header isPending={gameStates.isPending} />
-			<div class="mx-auto mb-10 mt-28 max-w-6xl">
+			<div class="mx-auto mb-10 mt-32 max-w-6xl md:mt-28">
 				{#if gameStates.isPending}
 					<Filter bind:gameStates bind:gameTheme />
 				{/if}

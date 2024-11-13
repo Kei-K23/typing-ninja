@@ -48,9 +48,11 @@
 	}
 </script>
 
-<div class="absolute left-1/2 top-20 flex -translate-x-1/2 items-center gap-x-3">
+<div
+	class="absolute left-1/2 top-20 flex -translate-x-1/2 flex-col items-center gap-x-3 gap-y-4 px-4 md:flex-row"
+>
 	<div
-		class="flex items-center gap-x-2 rounded-lg px-5 py-1.5 {gameTheme.textColor} {gameTheme.opacityAccentBackgroundColor}"
+		class="flex flex-wrap items-center gap-x-2 rounded-lg px-5 py-1.5 md:flex-nowrap {gameTheme.textColor} {gameTheme.opacityAccentBackgroundColor}"
 	>
 		<div
 			class="transition-all hover:text-yellow-400"
