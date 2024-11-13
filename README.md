@@ -1,6 +1,6 @@
 # Typing Ninja 🥷⌨️
 
-Typing Ninja is a open-source testing web application with minimalistic design and customization.
+Typing Ninja 🥷⌨️ is an open-source typing speed testing web application with minimalistic design and customization
 
 Try Typing-Ninja: [https://typing-ninja-two.vercel.app](https://typing-ninja-two.vercel.app)
 
